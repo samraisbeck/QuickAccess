@@ -52,7 +52,18 @@ class ProgramManager(QtGui.QMainWindow):
     def launchProgram(self):
         button = self.sender()
         text = button.text()
-        console = Popen([sys.executable, self.programs[text]], cwd = os.path.dirname(self.programs[text]), creationflags=CREATE_NEW_CONSOLE)
+        try:
+            if self.programs[text][-3:] == '.py':
+                Popen([sys.executable, self.programs[text]], cwd = os.path.dirname(self.programs[text]))
+            elif os.sep[0] in self.programs[text]:
+            # this is the case where we give something you would double click to start, like an executable
+                Popen([self.programs[text]], cwd = os.path.dirname(self.programs[text]))
+            else:
+            # this is the case where we give a program name like "chrome".
+                os.system("start "+self.programs[text])
+        except:
+            print "Could not open "+self.programs[text]
+            raise
 
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)

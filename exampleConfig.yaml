@@ -1,3 +1,6 @@
-Program 1: C:\Users\username\Documents\GitHub\folder\runGame.py
-Program 2: C:\Users\username\Documents\GitHub\folder\main.py
-Program 3: C:\Users\username\Documents\GitHub\folder\runProgram.py
+# 1. python file
+Program 1: C:\Users\username\Documents\GitHub\folder\main.py
+# 2. program accessable from cmd by 'start programName', like chrome
+Program 2: chrome
+# 3. executable
+Program 3: C:\Program Files\programName\program.exe

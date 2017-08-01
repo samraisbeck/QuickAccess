@@ -1,7 +1,7 @@
 # QuickAccess for Python
 Convenient program that makes launching personal programs super quick.
 ### How to Use
-Using this is very easy. If you have a Python program that can be launched from the command line,
+Using this is very easy. If you have a Python program that can be launched from the command line, a program that cmd can launch by "start", or an executable,
 it can be added to QuickAccess! All you must do is make a copy of `exampleConfig.yaml`, rename it as `config.yaml` and add the
 entry you would like. For example, if you have a program called "Hey There", and it is
 usually run by going to your documents and running `hey_there.py`, just do
