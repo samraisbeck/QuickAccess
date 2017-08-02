@@ -30,19 +30,38 @@ class ProgramManager(QtGui.QMainWindow):
         if self.programs == None:
             print 'No programs configured. Exiting...'
             sys.exit(0)
+        cols = 3
         label = QtGui.QLabel('QuickAccess for Windows', parent=self)
         font = QtGui.QFont()
         font.setBold(True)
-        font.setPointSize(15)
+        font.setPointSize(13)
         label.setFont(font)
         grid = QtGui.QGridLayout()
         grid.addWidget(label, 0, 0, alignment=QtCore.Qt.AlignHCenter)
+        hbox = QtGui.QHBoxLayout()
+        self.urlText = QtGui.QLineEdit()
+        self.urlText.setPlaceholderText('www.google.ca')
+        self.urlText.setToolTip('Enter a URL or click Launch to go to Google.')
+        self.connect(self.urlText, QtCore.SIGNAL('returnPressed()'), self.launchInternet)
+        self.secretCheck = QtGui.QCheckBox('Incognito?', parent=self)
+        self.secretCheck.setChecked(False)
+        self.secretCheck.setToolTip('Launch incognito (Chrome only)')
+        hbox.addWidget(self.secretCheck)
+        hbox.addWidget(self.urlText, parent=self)
+        button = QtGui.QPushButton('Launch', parent=self)
+        button.clicked.connect(self.launchInternet)
+        hbox.addWidget(button)
+        grid.addLayout(hbox, 1, 0, alignment=QtCore.Qt.AlignHCenter)
+        separator = QtGui.QFrame()
+        separator.setFrameShape(QtGui.QFrame.HLine)
+        separator.setFrameShadow(QtGui.QFrame.Sunken)
+        grid.addWidget(separator, 2, 0, 1, cols)
         buttonGrid = QtGui.QGridLayout()
         for i in range(len(self.programs)):
             button = QtGui.QPushButton(self.keys[i], parent=self)
             self.connect(button, QtCore.SIGNAL('pressed()'), self.launchProgram)
-            buttonGrid.addWidget(button, 0, i)
-        grid.addLayout(buttonGrid, 1, 0)
+            buttonGrid.addWidget(button, i/cols, i%cols)
+        grid.addLayout(buttonGrid, 3, 0)
         Qw = QtGui.QWidget()
         Qw.setLayout(grid)
         self.setCentralWidget(Qw)
@@ -64,6 +83,23 @@ class ProgramManager(QtGui.QMainWindow):
         except:
             print "Could not open "+self.programs[text]
             raise
+
+    def launchInternet(self):
+        url = self.urlText.text()
+        if not 'https' in url:
+            url = 'https://'+url
+        if url == 'https://':
+            url = 'https://google.ca'
+        if self.secretCheck.isChecked():
+            try:
+                os.system('start chrome '+url+' --incognito')
+            except:
+                print 'Chrome not installed! Can\'t go incognito'
+        else:
+            try:
+                os.system('start '+url)
+            except:
+                raise
 
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
