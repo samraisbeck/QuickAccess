@@ -2,6 +2,7 @@ from PySide import QtCore, QtGui
 import yaml
 from subprocess import *
 import os, sys
+from widgetInternet import WidgetInternet
 
 class ProgramManager(QtGui.QMainWindow):
     def __init__(self):
@@ -38,24 +39,12 @@ class ProgramManager(QtGui.QMainWindow):
         label.setFont(font)
         grid = QtGui.QGridLayout()
         grid.addWidget(label, 0, 0, alignment=QtCore.Qt.AlignHCenter)
-        hbox = QtGui.QHBoxLayout()
-        self.urlText = QtGui.QLineEdit()
-        self.urlText.setPlaceholderText('www.google.ca')
-        self.urlText.setToolTip('Enter a URL or click Launch to go to Google.')
-        self.connect(self.urlText, QtCore.SIGNAL('returnPressed()'), self.launchInternet)
-        self.secretCheck = QtGui.QCheckBox('Incognito?', parent=self)
-        self.secretCheck.setChecked(False)
-        self.secretCheck.setToolTip('Launch incognito (Chrome only)')
-        hbox.addWidget(self.secretCheck)
-        hbox.addWidget(self.urlText, parent=self)
-        button = QtGui.QPushButton('Launch', parent=self)
-        button.clicked.connect(self.launchInternet)
-        hbox.addWidget(button)
-        grid.addLayout(hbox, 1, 0, alignment=QtCore.Qt.AlignHCenter)
+        self._InternetOptions = WidgetInternet(parent=self)
+        grid.addWidget(self._InternetOptions, 1, 0, alignment=QtCore.Qt.AlignHCenter)
         separator = QtGui.QFrame()
         separator.setFrameShape(QtGui.QFrame.HLine)
         separator.setFrameShadow(QtGui.QFrame.Sunken)
-        grid.addWidget(separator, 2, 0, 1, cols)
+        grid.addWidget(separator, 2, 0)
         buttonGrid = QtGui.QGridLayout()
         for i in range(len(self.programs)):
             button = QtGui.QPushButton(self.keys[i], parent=self)
@@ -84,22 +73,14 @@ class ProgramManager(QtGui.QMainWindow):
             print "Could not open "+self.programs[text]
             raise
 
-    def launchInternet(self):
-        url = self.urlText.text()
-        if not 'https' in url:
-            url = 'https://'+url
-        if url == 'https://':
-            url = 'https://google.ca'
-        if self.secretCheck.isChecked():
-            try:
-                os.system('start chrome '+url+' --incognito')
-            except:
-                print 'Chrome not installed! Can\'t go incognito'
-        else:
-            try:
-                os.system('start '+url)
-            except:
-                raise
+    def closeEvent(self, event):
+        history = self._InternetOptions.history
+        if not history == []:
+            with open('history.txt', 'w') as f:
+                for item in history:
+                    f.write(item[0]+' '+str(item[1])+'\n')
+                f.close()
+        super(ProgramManager, self).closeEvent(event)
 
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
