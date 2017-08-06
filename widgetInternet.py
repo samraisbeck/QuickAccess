@@ -47,10 +47,10 @@ class WidgetInternet(QtGui.QWidget):
             urlBase = 'google.ca'
             url = 'https://google.ca'
         if self.secretCheck.isChecked():
-            # try:
-            #     os.system('start chrome '+url+' --incognito')
-            # except:
-            #     print 'Chrome not installed! Can\'t go incognito'
+            try:
+                os.system('start chrome '+url+' --incognito')
+            except:
+                print 'Chrome not installed! Can\'t go incognito'
             pass
         else:
             try:
