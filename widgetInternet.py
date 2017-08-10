@@ -17,15 +17,10 @@ class WidgetInternet(QtGui.QWidget):
         self.urlText.setToolTip('Enter a URL or click Launch to go to Google.')
         self._updateTextCompletion()
         self.connect(self.urlText, QtCore.SIGNAL('returnPressed()'), self.launchInternet)
-        vbox = QtGui.QVBoxLayout()
         self.secretCheck = QtGui.QCheckBox('Incognito?', parent=self)
         self.secretCheck.setChecked(False)
         self.secretCheck.setToolTip('Launch incognito (Chrome only)')
-        vbox.addWidget(self.secretCheck)
-        button = QtGui.QPushButton('Clear History', parent=self)
-        button.clicked.connect(self.clearHistory)
-        vbox.addWidget(button)
-        hbox.addLayout(vbox)
+        hbox.addWidget(self.secretCheck)
         hbox.addWidget(self.urlText, parent=self)
         button = QtGui.QPushButton('Launch', parent=self)
         button.clicked.connect(self.launchInternet)
@@ -46,6 +41,15 @@ class WidgetInternet(QtGui.QWidget):
         if url == 'https://':
             urlBase = 'google.ca'
             url = 'https://google.ca'
+        if (not '.' in urlBase) or (' ' in urlBase):
+            searchStr = ''
+            for char in urlBase:
+                if char == ' ':
+                    searchStr += '+'
+                else:
+                    searchStr += char
+            urlBase = 'google.ca' # for history purposes
+            url = 'https://'+urlBase+'/search?q='+searchStr
         if self.secretCheck.isChecked():
             try:
                 os.system('start chrome '+url+' --incognito')
@@ -54,10 +58,8 @@ class WidgetInternet(QtGui.QWidget):
             pass
         else:
             try:
-                # os.system('start '+url)
+                os.system('start '+url)
                 self.addToHistory(urlBase)
-
-
             except:
                 raise
 
@@ -79,6 +81,8 @@ class WidgetInternet(QtGui.QWidget):
             affectedCompletion = True
         else:
             _range = range(index)
+            # We only check history entries before the one we just added, since the
+            # ones after will all have less hits
             for i in reversed(_range):
                 if self.history[i][1] < self.history[index][1]:
                     temp = self.history[i]
@@ -88,7 +92,6 @@ class WidgetInternet(QtGui.QWidget):
                     affectedCompletion = True
         if affectedCompletion:
             self._updateTextCompletion()
-        print self.history
 
     def clearHistory(self):
         confirmed = QtGui.QMessageBox.question(self, 'Confirmation', 'Are you sure you want to clear the history? You\n'+\
